@@ -1,0 +1,88 @@
+{
+  "id": "crm-credit-assessment",
+  "version": "1.0.0",
+  "metadata": {
+    "name": "Counterparty Credit Assessment Requirements",
+    "description": "Ensures counterparties undergo proper credit assessment",
+    "domain": "CRM",
+    "effectiveDate": "2024-01-01",
+    "owner": "Credit Risk Team",
+    "severity": "high",
+    "tags": ["credit", "assessment", "due-diligence"]
+  },
+  "rules": [
+    {
+      "id": "cca-001",
+      "name": "Credit rating assigned",
+      "description": "Counterparty must have internal credit rating",
+      "type": "required_field",
+      "severity": "critical",
+      "conditions": {
+        "all": [
+          { "path": "$.counterparty.creditRating.internal", "operator": "exists" },
+          { "path": "$.counterparty.creditRating.internal", "operator": "in", "value": ["AAA", "AA", "A", "BBB", "BB", "B", "CCC", "CC", "C", "D"] }
+        ]
+      },
+      "remediation": "Complete credit assessment and assign internal rating"
+    },
+    {
+      "id": "cca-002",
+      "name": "Financial statements current",
+      "description": "Financial statements must be less than 18 months old",
+      "type": "temporal",
+      "severity": "high",
+      "conditions": {
+        "all": [
+          { "path": "$.counterparty.financials.statementDate", "operator": "exists" },
+          { "path": "$.counterparty.financials.statementDate", "operator": "date_within", "value": "18m" }
+        ]
+      },
+      "remediation": "Obtain updated financial statements from counterparty"
+    },
+    {
+      "id": "cca-003",
+      "name": "KYC documentation complete",
+      "description": "Know Your Customer documentation must be complete",
+      "type": "required_field",
+      "severity": "critical",
+      "conditions": {
+        "all": [
+          { "path": "$.counterparty.kyc.status", "operator": "equals", "value": "complete" },
+          { "path": "$.counterparty.kyc.lastUpdateDate", "operator": "date_within", "value": "365d" }
+        ]
+      },
+      "remediation": "Complete KYC documentation for the counterparty"
+    },
+    {
+      "id": "cca-004",
+      "name": "Investment grade handling",
+      "description": "Sub-investment grade counterparties require enhanced due diligence",
+      "type": "conditional",
+      "severity": "high",
+      "when": {
+        "path": "$.counterparty.creditRating.internal",
+        "operator": "in",
+        "value": ["BB", "B", "CCC", "CC", "C"]
+      },
+      "conditions": {
+        "path": "$.counterparty.enhancedDueDiligence.completed",
+        "operator": "equals",
+        "value": true
+      },
+      "remediation": "Complete enhanced due diligence for sub-investment grade counterparty"
+    },
+    {
+      "id": "cca-005",
+      "name": "Default probability within limits",
+      "description": "Probability of default must be within acceptable range",
+      "type": "value_range",
+      "severity": "high",
+      "conditions": {
+        "path": "$.counterparty.creditMetrics.probabilityOfDefault",
+        "operator": "less_than_or_equal",
+        "value": 0.10
+      },
+      "remediation": "Review counterparty relationship for counterparties with PD > 10%"
+    }
+  ]
+}

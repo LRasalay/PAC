@@ -1,0 +1,80 @@
+{
+  "id": "erm-risk-assessment",
+  "version": "1.0.0",
+  "metadata": {
+    "name": "Enterprise Risk Assessment Requirements",
+    "description": "Ensures all business units complete required risk assessments",
+    "domain": "ERM",
+    "effectiveDate": "2024-01-01",
+    "owner": "Enterprise Risk Management",
+    "severity": "high",
+    "tags": ["risk-assessment", "compliance", "governance"]
+  },
+  "rules": [
+    {
+      "id": "era-001",
+      "name": "Annual risk assessment completed",
+      "description": "Business units must complete annual risk assessments",
+      "type": "temporal",
+      "severity": "critical",
+      "conditions": {
+        "all": [
+          { "path": "$.businessUnit.riskAssessment.completedDate", "operator": "exists" },
+          { "path": "$.businessUnit.riskAssessment.completedDate", "operator": "date_within", "value": "365d" }
+        ]
+      },
+      "remediation": "Complete annual risk assessment for the business unit"
+    },
+    {
+      "id": "era-002",
+      "name": "Risk categories identified",
+      "description": "Risk assessment must identify all relevant risk categories",
+      "type": "required_field",
+      "severity": "high",
+      "conditions": {
+        "all": [
+          { "path": "$.businessUnit.riskAssessment.categories", "operator": "exists" },
+          { "path": "$.businessUnit.riskAssessment.categories", "operator": "length_greater_than", "value": 0 }
+        ]
+      },
+      "remediation": "Identify and document relevant risk categories"
+    },
+    {
+      "id": "era-003",
+      "name": "Risk mitigation plans documented",
+      "description": "High and critical risks must have mitigation plans",
+      "type": "conditional",
+      "severity": "high",
+      "conditions": {
+        "any": [
+          {
+            "all": [
+              { "path": "$.businessUnit.riskAssessment.highRiskCount", "operator": "equals", "value": 0 },
+              { "path": "$.businessUnit.riskAssessment.criticalRiskCount", "operator": "equals", "value": 0 }
+            ]
+          },
+          {
+            "all": [
+              { "path": "$.businessUnit.riskAssessment.mitigationPlans", "operator": "exists" },
+              { "path": "$.businessUnit.riskAssessment.mitigationPlans", "operator": "length_greater_than", "value": 0 }
+            ]
+          }
+        ]
+      },
+      "remediation": "Document mitigation plans for all high and critical risks"
+    },
+    {
+      "id": "era-004",
+      "name": "Risk owner assigned",
+      "description": "Each identified risk must have an assigned owner",
+      "type": "required_field",
+      "severity": "medium",
+      "conditions": {
+        "path": "$.businessUnit.riskAssessment.allRisksHaveOwners",
+        "operator": "equals",
+        "value": true
+      },
+      "remediation": "Assign owners to all identified risks"
+    }
+  ]
+}

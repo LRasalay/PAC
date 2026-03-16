@@ -1,0 +1,95 @@
+{
+  "id": "mrm-model-validation",
+  "version": "1.0.0",
+  "metadata": {
+    "name": "Model Validation Requirements",
+    "description": "Ensures models undergo proper validation before production deployment",
+    "domain": "MRM",
+    "effectiveDate": "2024-01-01",
+    "owner": "Model Validation Team",
+    "severity": "critical",
+    "tags": ["validation", "testing", "production-readiness"]
+  },
+  "rules": [
+    {
+      "id": "val-001",
+      "name": "Initial validation completed",
+      "description": "Models must complete initial validation before deployment",
+      "type": "required_field",
+      "severity": "critical",
+      "conditions": {
+        "all": [
+          { "path": "$.model.validation.status", "operator": "in", "value": ["approved", "conditionally_approved"] },
+          { "path": "$.model.validation.completedDate", "operator": "exists" }
+        ]
+      },
+      "remediation": "Submit model for validation and obtain approval before deployment"
+    },
+    {
+      "id": "val-002",
+      "name": "Performance metrics within thresholds",
+      "description": "Model performance metrics must meet minimum standards",
+      "type": "value_range",
+      "severity": "high",
+      "when": {
+        "path": "$.model.type",
+        "operator": "equals",
+        "value": "classification"
+      },
+      "conditions": {
+        "all": [
+          { "path": "$.model.metrics.auc", "operator": "greater_than_or_equal", "value": 0.7 },
+          { "path": "$.model.metrics.accuracy", "operator": "greater_than_or_equal", "value": 0.8 }
+        ]
+      },
+      "remediation": "Improve model performance to meet minimum AUC (0.7) and accuracy (0.8) thresholds"
+    },
+    {
+      "id": "val-003",
+      "name": "Backtesting completed",
+      "description": "Models must have recent backtesting results",
+      "type": "temporal",
+      "severity": "high",
+      "conditions": {
+        "all": [
+          { "path": "$.model.backtesting.lastRunDate", "operator": "exists" },
+          { "path": "$.model.backtesting.lastRunDate", "operator": "date_within", "value": "90d" },
+          { "path": "$.model.backtesting.status", "operator": "equals", "value": "passed" }
+        ]
+      },
+      "remediation": "Run backtesting and ensure results meet standards"
+    },
+    {
+      "id": "val-004",
+      "name": "Risk rating assigned",
+      "description": "All models must have a risk rating",
+      "type": "required_field",
+      "severity": "high",
+      "conditions": {
+        "path": "$.model.riskRating",
+        "operator": "in",
+        "value": ["low", "medium", "high", "critical"]
+      },
+      "remediation": "Assign appropriate risk rating based on model impact assessment"
+    },
+    {
+      "id": "val-005",
+      "name": "High-risk models require enhanced validation",
+      "description": "Models rated high or critical risk require additional validation steps",
+      "type": "conditional",
+      "severity": "critical",
+      "when": {
+        "path": "$.model.riskRating",
+        "operator": "in",
+        "value": ["high", "critical"]
+      },
+      "conditions": {
+        "all": [
+          { "path": "$.model.validation.independentReview", "operator": "equals", "value": true },
+          { "path": "$.model.validation.seniorApproval", "operator": "equals", "value": true }
+        ]
+      },
+      "remediation": "Obtain independent review and senior management approval for high-risk models"
+    }
+  ]
+}

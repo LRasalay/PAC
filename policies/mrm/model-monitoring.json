@@ -1,0 +1,79 @@
+{
+  "id": "mrm-model-monitoring",
+  "version": "1.0.0",
+  "metadata": {
+    "name": "Model Monitoring Requirements",
+    "description": "Ensures production models are continuously monitored for performance degradation",
+    "domain": "MRM",
+    "effectiveDate": "2024-01-01",
+    "owner": "Model Risk Management Team",
+    "severity": "high",
+    "tags": ["monitoring", "production", "performance"]
+  },
+  "rules": [
+    {
+      "id": "mon-001",
+      "name": "Monitoring enabled",
+      "description": "Production models must have monitoring enabled",
+      "type": "required_field",
+      "severity": "critical",
+      "when": {
+        "path": "$.model.environment",
+        "operator": "equals",
+        "value": "production"
+      },
+      "conditions": {
+        "path": "$.model.monitoring.enabled",
+        "operator": "equals",
+        "value": true
+      },
+      "remediation": "Enable monitoring for the production model"
+    },
+    {
+      "id": "mon-002",
+      "name": "Performance thresholds defined",
+      "description": "Models must have defined performance thresholds for alerts",
+      "type": "required_field",
+      "severity": "high",
+      "conditions": {
+        "all": [
+          { "path": "$.model.monitoring.thresholds", "operator": "exists" },
+          { "path": "$.model.monitoring.thresholds.performance", "operator": "exists" }
+        ]
+      },
+      "remediation": "Define performance thresholds for model monitoring alerts"
+    },
+    {
+      "id": "mon-003",
+      "name": "Recent monitoring report available",
+      "description": "Models must have monitoring reports generated within the last 30 days",
+      "type": "temporal",
+      "severity": "medium",
+      "when": {
+        "path": "$.model.environment",
+        "operator": "equals",
+        "value": "production"
+      },
+      "conditions": {
+        "all": [
+          { "path": "$.model.monitoring.lastReportDate", "operator": "exists" },
+          { "path": "$.model.monitoring.lastReportDate", "operator": "date_within", "value": "30d" }
+        ]
+      },
+      "remediation": "Generate monthly monitoring report for the model"
+    },
+    {
+      "id": "mon-004",
+      "name": "Data drift monitoring active",
+      "description": "Models must monitor for input data drift",
+      "type": "required_field",
+      "severity": "high",
+      "conditions": {
+        "path": "$.model.monitoring.dataDriftEnabled",
+        "operator": "equals",
+        "value": true
+      },
+      "remediation": "Enable data drift monitoring for the model"
+    }
+  ]
+}

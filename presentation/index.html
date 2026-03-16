@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Policy-as-Code | Risk Management & Compliance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --secondary: #10b981;
+      --accent: #8b5cf6;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --dark-light: #1e293b;
+      --gray: #64748b;
+      --light: #f8fafc;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--dark);
+      color: white;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Slide Container */
+    .slides {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      height: 100vh;
+    }
+
+    .slide {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 120px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
+      .slide {
+        padding: 40px 60px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .slide {
+        padding: 30px;
+      }
+    }
+
+    /* Backgrounds */
+    .slide-dark {
+      background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+    }
+
+    .slide-gradient {
+      background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #db2777 100%);
+    }
+
+    .slide-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    }
+
+    .slide-secondary {
+      background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+    }
+
+    /* Decorative Elements */
+    .bg-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .floating-shapes {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+    }
+
+    .shape-1 {
+      width: 400px;
+      height: 400px;
+      background: var(--primary);
+      top: -100px;
+      right: -100px;
+    }
+
+    .shape-2 {
+      width: 300px;
+      height: 300px;
+      background: var(--accent);
+      bottom: -50px;
+      left: -50px;
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    h4 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 800px;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 40px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Slide Number */
+    .slide-number {
+      position: absolute;
+      bottom: 40px;
+      right: 60px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 500;
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+    }
+
+    .logo-icon .material-icons {
+      font-size: 28px;
+      color: white;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .logo-text span {
+      color: var(--primary);
+    }
+
+    /* Cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .card-icon .material-icons {
+      font-size: 28px;
+      color: white;
+    }
+
+    .card-icon.blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .card-icon.green { background: linear-gradient(135deg, #10b981, #059669); }
+    .card-icon.amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .card-icon.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .card-icon.pink { background: linear-gradient(135deg, #ec4899, #db2777); }
+    .card-icon.cyan { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+
+    .card h4 {
+      color: white;
+    }
+
+    .card p {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Feature List */
+    .feature-list {
+      list-style: none;
+      margin-top: 30px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-list li:last-child {
+      border-bottom: none;
+    }
+
+    .feature-list .material-icons {
+      color: var(--secondary);
+      font-size: 24px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .feature-list span {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* Code Block */
+    .code-block {
+      background: #0d1117;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .code-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .code-dot.red { background: #ff5f56; }
+    .code-dot.yellow { background: #ffbd2e; }
+    .code-dot.green { background: #27ca40; }
+
+    .code-title {
+      margin-left: 12px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    pre {
+      padding: 24px;
+      overflow-x: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #e6edf3;
+    }
+
+    .code-keyword { color: #ff7b72; }
+    .code-string { color: #a5d6ff; }
+    .code-property { color: #79c0ff; }
+    .code-value { color: #7ee787; }
+    .code-comment { color: #8b949e; }
+
+    /* Architecture Diagram */
+    .architecture {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 50px;
+      flex-wrap: wrap;
+    }
+
+    .arch-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 30px 40px;
+      text-align: center;
+      min-width: 180px;
+    }
+
+    .arch-box h4 {
+      margin-bottom: 8px;
+    }
+
+    .arch-box p {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .arch-arrow {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 32px;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+      margin-top: 50px;
+    }
+
+    @media (max-width: 1024px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-value {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Domain Tags */
+    .domain-tags {
+      display: flex;
+      gap: 16px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    .domain-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .domain-tag.mrm {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(29, 78, 216, 0.2));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+    }
+
+    .domain-tag.erm {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+
+    .domain-tag.crm {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.2));
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+
+    .domain-tag .material-icons {
+      font-size: 24px;
+    }
+
+    /* Two Column Layout */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    @media (max-width: 1024px) {
+      .two-col {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+    }
+
+    /* Tech Stack */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .tech-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .tech-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.05);
+    }
+
+    .tech-item .icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .tech-item h4 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .tech-item p {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      margin-top: 50px;
+      padding-left: 40px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 12px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--primary), var(--accent), var(--secondary));
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 40px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -34px;
+      top: 6px;
+      width: 16px;
+      height: 16px;
+      background: var(--primary);
+      border-radius: 50%;
+      border: 3px solid var(--dark);
+    }
+
+    .timeline-item h4 {
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .timeline-item p {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Navigation Dots */
+    .nav-dots {
+      position: fixed;
+      right: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    .nav-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .nav-dot:hover,
+    .nav-dot.active {
+      background: white;
+      transform: scale(1.3);
+    }
+
+    /* Keyboard Hint */
+    .keyboard-hint {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .keyboard-hint kbd {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate {
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+  </style>
+</head>
+<body>
+  <div class="slides" id="slides">
+
+    <!-- Slide 1: Title -->
+    <section class="slide slide-dark" id="slide-1">
+      <div class="bg-pattern"></div>
+      <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+      </div>
+      <div class="logo animate">
+        <div class="logo-icon">
+          <span class="material-icons">shield</span>
+        </div>
+        <div class="logo-text">Policy<span>Hub</span></div>
+      </div>
+      <h1 class="animate delay-1">Policy-as-Code</h1>
+      <p class="subtitle animate delay-2">A modern approach to risk management and compliance automation</p>
+      <div class="domain-tags animate delay-3">
+        <div class="domain-tag mrm">
+          <span class="material-icons">model_training</span>
+          Model Risk Management
+        </div>
+        <div class="domain-tag erm">
+          <span class="material-icons">security</span>
+          Enterprise Risk Management
+        </div>
+        <div class="domain-tag crm">
+          <span class="material-icons">handshake</span>
+          Counterparty Risk Management
+        </div>
+      </div>
+      <div class="slide-number">01 / 12</div>
+    </section>
+
+    <!-- Slide 2: Problem Statement -->
+    <section class="slide slide-dark" id="slide-2">
+      <div class="bg-pattern"></div>
+      <h2>The Challenge</h2>
+      <p class="subtitle">Traditional compliance is slow, error-prone, and doesn't scale</p>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon amber">
+            <span class="material-icons">schedule</span>
+          </div>
+          <h4>Manual Processes</h4>
+          <p>Compliance checks require manual review, creating bottlenecks and delays in critical workflows</p>
+        </div>
+        <div class="card">
+          <div class="card-icon pink">
+            <span class="material-icons">error</span>
+          </div>
+          <h4>Inconsistent Enforcement</h4>
+          <p>Different interpretations of policies lead to inconsistent application across teams and systems</p>
+        </div>
+        <div class="card">
+          <div class="card-icon purple">
+            <span class="material-icons">visibility_off</span>
+          </div>
+          <h4>Limited Visibility</h4>
+          <p>Lack of real-time insights into compliance status makes proactive risk management difficult</p>
+        </div>
+      </div>
+      <div class="slide-number">02 / 12</div>
+    </section>
+
+    <!-- Slide 3: Solution Overview -->
+    <section class="slide slide-gradient" id="slide-3">
+      <h2>The Solution</h2>
+      <p class="subtitle">Define policies as code, enforce them automatically, integrate everywhere</p>
+      <ul class="feature-list">
+        <li>
+          <span class="material-icons">code</span>
+          <span><strong>Policies as Code</strong> - Define compliance rules in version-controlled JSON schemas</span>
+        </li>
+        <li>
+          <span class="material-icons">bolt</span>
+          <span><strong>Real-time Evaluation</strong> - Instant compliance checks via REST API</span>
+        </li>
+        <li>
+          <span class="material-icons">integration_instructions</span>
+          <span><strong>Universal Integration</strong> - Works with any system through API or MCP</span>
+        </li>
+        <li>
+          <span class="material-icons">insights</span>
+          <span><strong>Full Audit Trail</strong> - Every evaluation logged for compliance reporting</span>
+        </li>
+        <li>
+          <span class="material-icons">smart_toy</span>
+          <span><strong>AI-Ready</strong> - MCP integration for Claude and other AI assistants</span>
+        </li>
+      </ul>
+      <div class="slide-number">03 / 12</div>
+    </section>
+
+    <!-- Slide 4: Architecture -->
+    <section class="slide slide-dark" id="slide-4">
+      <div class="bg-pattern"></div>
+      <h2>Architecture</h2>
+      <p class="subtitle">Clean, modular design built for enterprise scale</p>
+      <div class="architecture">
+        <div class="arch-box">
+          <h4>UI</h4>
+          <p>Angular 19</p>
+        </div>
+        <span class="arch-arrow material-icons">arrow_forward</span>
+        <div class="arch-box">
+          <h4>REST API</h4>
+          <p>FastAPI</p>
+        </div>
+        <span class="arch-arrow material-icons">arrow_forward</span>
+        <div class="arch-box">
+          <h4>Rule Engine</h4>
+          <p>Python</p>
+        </div>
+        <span class="arch-arrow material-icons">arrow_forward</span>
+        <div class="arch-box">
+          <h4>Policy Store</h4>
+          <p>JSON / PostgreSQL</p>
+        </div>
+      </div>
+      <div class="architecture" style="margin-top: 30px;">
+        <div class="arch-box">
+          <h4>MCP Server</h4>
+          <p>Claude Integration</p>
+        </div>
+        <span class="arch-arrow material-icons">sync_alt</span>
+        <div class="arch-box">
+          <h4>REST API</h4>
+          <p>FastAPI</p>
+        </div>
+      </div>
+      <div class="slide-number">04 / 12</div>
+    </section>
+
+    <!-- Slide 5: Policy Schema -->
+    <section class="slide slide-dark" id="slide-5">
+      <div class="bg-pattern"></div>
+      <div class="two-col">
+        <div>
+          <h2>Policy Schema</h2>
+          <p>Flexible JSON-based policy definitions with powerful rule expressions</p>
+          <ul class="feature-list" style="margin-top: 20px;">
+            <li>
+              <span class="material-icons">check_circle</span>
+              <span>JSONPath-based field access</span>
+            </li>
+            <li>
+              <span class="material-icons">check_circle</span>
+              <span>Boolean logic (all, any, not)</span>
+            </li>
+            <li>
+              <span class="material-icons">check_circle</span>
+              <span>Conditional rules (when/then)</span>
+            </li>
+            <li>
+              <span class="material-icons">check_circle</span>
+              <span>Date and temporal operators</span>
+            </li>
+          </ul>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+            <span class="code-title">policy.json</span>
+          </div>
+          <pre>{
+  <span class="code-property">"id"</span>: <span class="code-string">"mrm-model-doc"</span>,
+  <span class="code-property">"version"</span>: <span class="code-string">"1.0.0"</span>,
+  <span class="code-property">"metadata"</span>: {
+    <span class="code-property">"name"</span>: <span class="code-string">"Model Documentation"</span>,
+    <span class="code-property">"domain"</span>: <span class="code-string">"MRM"</span>,
+    <span class="code-property">"severity"</span>: <span class="code-string">"high"</span>
+  },
+  <span class="code-property">"rules"</span>: [{
+    <span class="code-property">"id"</span>: <span class="code-string">"doc-001"</span>,
+    <span class="code-property">"conditions"</span>: {
+      <span class="code-property">"path"</span>: <span class="code-string">"$.model.documentation"</span>,
+      <span class="code-property">"operator"</span>: <span class="code-string">"exists"</span>
+    }
+  }]
+}</pre>
+        </div>
+      </div>
+      <div class="slide-number">05 / 12</div>
+    </section>
+
+    <!-- Slide 6: Rule Engine -->
+    <section class="slide slide-dark" id="slide-6">
+      <div class="bg-pattern"></div>
+      <h2>Powerful Rule Engine</h2>
+      <p class="subtitle">Extensible operators for any compliance scenario</p>
+      <div class="card-grid">
+        <div class="card">
+          <h4>Existence Checks</h4>
+          <p><code>exists</code>, <code>not_exists</code>, <code>is_empty</code>, <code>is_not_empty</code></p>
+        </div>
+        <div class="card">
+          <h4>Comparisons</h4>
+          <p><code>equals</code>, <code>not_equals</code>, <code>greater_than</code>, <code>less_than</code></p>
+        </div>
+        <div class="card">
+          <h4>Collections</h4>
+          <p><code>in</code>, <code>not_in</code>, <code>contains</code>, <code>contains_all</code></p>
+        </div>
+        <div class="card">
+          <h4>Patterns</h4>
+          <p><code>matches</code>, <code>starts_with</code>, <code>ends_with</code></p>
+        </div>
+        <div class="card">
+          <h4>Temporal</h4>
+          <p><code>date_before</code>, <code>date_after</code>, <code>date_within</code></p>
+        </div>
+        <div class="card">
+          <h4>Boolean Logic</h4>
+          <p><code>all</code>, <code>any</code>, <code>not</code> for complex conditions</p>
+        </div>
+      </div>
+      <div class="slide-number">06 / 12</div>
+    </section>
+
+    <!-- Slide 7: API -->
+    <section class="slide slide-dark" id="slide-7">
+      <div class="bg-pattern"></div>
+      <div class="two-col">
+        <div>
+          <h2>REST API</h2>
+          <p>Simple, powerful API for policy management and evaluation</p>
+          <ul class="feature-list" style="margin-top: 20px;">
+            <li>
+              <span class="material-icons">description</span>
+              <span>Policy CRUD operations</span>
+            </li>
+            <li>
+              <span class="material-icons">play_circle</span>
+              <span>Single & bulk evaluation</span>
+            </li>
+            <li>
+              <span class="material-icons">history</span>
+              <span>Evaluation history & audit</span>
+            </li>
+            <li>
+              <span class="material-icons">auto_awesome</span>
+              <span>OpenAPI documentation</span>
+            </li>
+          </ul>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+            <span class="code-title">evaluate.sh</span>
+          </div>
+          <pre><span class="code-comment"># Evaluate data against a policy</span>
+curl -X POST /api/v1/evaluate \
+  -H <span class="code-string">"Content-Type: application/json"</span> \
+  -d '{
+    <span class="code-property">"policy_id"</span>: <span class="code-string">"mrm-model-doc"</span>,
+    <span class="code-property">"data"</span>: {
+      <span class="code-property">"model"</span>: {
+        <span class="code-property">"id"</span>: <span class="code-string">"credit-v2"</span>,
+        <span class="code-property">"documentation"</span>: {...}
+      }
+    }
+  }'
+
+<span class="code-comment"># Response</span>
+{
+  <span class="code-property">"compliant"</span>: <span class="code-value">true</span>,
+  <span class="code-property">"results"</span>: [...]
+}</pre>
+        </div>
+      </div>
+      <div class="slide-number">07 / 12</div>
+    </section>
+
+    <!-- Slide 8: MCP Integration -->
+    <section class="slide slide-primary" id="slide-8">
+      <h2>AI-Native Integration</h2>
+      <p class="subtitle">MCP Server for Claude Code and Claude Desktop</p>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon cyan">
+            <span class="material-icons">smart_toy</span>
+          </div>
+          <h4>Natural Language Queries</h4>
+          <p>"Check if this model is compliant with MRM policies"</p>
+        </div>
+        <div class="card">
+          <div class="card-icon green">
+            <span class="material-icons">terminal</span>
+          </div>
+          <h4>CLI Integration</h4>
+          <p>Engineers can evaluate compliance directly from Claude Code</p>
+        </div>
+        <div class="card">
+          <div class="card-icon purple">
+            <span class="material-icons">auto_fix_high</span>
+          </div>
+          <h4>Remediation Guidance</h4>
+          <p>AI-assisted suggestions for fixing compliance issues</p>
+        </div>
+      </div>
+      <div class="code-block" style="margin-top: 40px; max-width: 700px;">
+        <div class="code-header">
+          <span class="code-dot red"></span>
+          <span class="code-dot yellow"></span>
+          <span class="code-dot green"></span>
+          <span class="code-title">MCP Tools Available</span>
+        </div>
+        <pre>list_policies      <span class="code-comment"># List all policies</span>
+get_policy         <span class="code-comment"># Get policy details</span>
+create_policy      <span class="code-comment"># Create new policy</span>
+evaluate           <span class="code-comment"># Check compliance</span>
+bulk_evaluate      <span class="code-comment"># Batch evaluation</span>
+get_sample_data    <span class="code-comment"># Sample data for testing</span></pre>
+      </div>
+      <div class="slide-number">08 / 12</div>
+    </section>
+
+    <!-- Slide 9: UI -->
+    <section class="slide slide-dark" id="slide-9">
+      <div class="bg-pattern"></div>
+      <h2>Modern Web Interface</h2>
+      <p class="subtitle">Intuitive UI for policy management and compliance monitoring</p>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon blue">
+            <span class="material-icons">dashboard</span>
+          </div>
+          <h4>Dashboard</h4>
+          <p>Real-time compliance overview with domain-specific metrics and recent activity</p>
+        </div>
+        <div class="card">
+          <div class="card-icon green">
+            <span class="material-icons">description</span>
+          </div>
+          <h4>Policy Manager</h4>
+          <p>Browse, search, and manage policies with rich filtering and sorting</p>
+        </div>
+        <div class="card">
+          <div class="card-icon amber">
+            <span class="material-icons">edit_note</span>
+          </div>
+          <h4>Policy Editor</h4>
+          <p>Visual and JSON editor with rule templates and validation</p>
+        </div>
+        <div class="card">
+          <div class="card-icon purple">
+            <span class="material-icons">play_circle</span>
+          </div>
+          <h4>Evaluation Console</h4>
+          <p>Test data against policies with detailed result visualization</p>
+        </div>
+        <div class="card">
+          <div class="card-icon pink">
+            <span class="material-icons">playlist_add_check</span>
+          </div>
+          <h4>Bulk Evaluation</h4>
+          <p>Process multiple items at once with summary statistics</p>
+        </div>
+        <div class="card">
+          <div class="card-icon cyan">
+            <span class="material-icons">code</span>
+          </div>
+          <h4>API Explorer</h4>
+          <p>Interactive OpenAPI documentation for developers</p>
+        </div>
+      </div>
+      <div class="slide-number">09 / 12</div>
+    </section>
+
+    <!-- Slide 10: Technology Stack -->
+    <section class="slide slide-dark" id="slide-10">
+      <div class="bg-pattern"></div>
+      <h2>Technology Stack</h2>
+      <p class="subtitle">Built with modern, production-ready technologies</p>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <div class="icon">&#9889;</div>
+          <h4>FastAPI</h4>
+          <p>REST API</p>
+        </div>
+        <div class="tech-item">
+          <div class="icon">&#128640;</div>
+          <h4>Angular 19</h4>
+          <p>Frontend</p>
+        </div>
+        <div class="tech-item">
+          <div class="icon">&#127912;</div>
+          <h4>Material</h4>
+          <p>UI Components</p>
+        </div>
+        <div class="tech-item">
+          <div class="icon">&#128013;</div>
+          <h4>Python 3.11</h4>
+          <p>Backend</p>
+        </div>
+        <div class="tech-item">
+          <div class="icon">&#128202;</div>
+          <h4>Pydantic</h4>
+          <p>Validation</p>
+        </div>
+        <div class="tech-item">
+          <div class="icon">&#128268;</div>
+          <h4>JSONPath</h4>
+          <p>Data Access</p>
+        </div>
+        <div class="tech-item">
+          <div class="icon">&#129302;</div>
+          <h4>MCP</h4>
+          <p>AI Integration</p>
+        </div>
+        <div class="tech-item">
+          <div class="icon">&#128230;</div>
+          <h4>Docker</h4>
+          <p>Deployment</p>
+        </div>
+      </div>
+      <div class="slide-number">10 / 12</div>
+    </section>
+
+    <!-- Slide 11: Roadmap -->
+    <section class="slide slide-dark" id="slide-11">
+      <div class="bg-pattern"></div>
+      <div class="two-col">
+        <div>
+          <h2>Roadmap</h2>
+          <p>Continued development and enhancement</p>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <h4>Phase 1 - Complete</h4>
+            <p>Core engine, REST API, Web UI, MCP integration</p>
+          </div>
+          <div class="timeline-item">
+            <h4>Phase 2 - In Progress</h4>
+            <p>PDF extraction, policy versioning with diff tracking</p>
+          </div>
+          <div class="timeline-item">
+            <h4>Phase 3 - Planned</h4>
+            <p>Webhook notifications, scheduled evaluations</p>
+          </div>
+          <div class="timeline-item">
+            <h4>Phase 4 - Future</h4>
+            <p>ML-powered policy suggestions, cross-policy analytics</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-number">11 / 12</div>
+    </section>
+
+    <!-- Slide 12: Thank You -->
+    <section class="slide slide-gradient" id="slide-12">
+      <div style="text-align: center;">
+        <div class="logo" style="justify-content: center; margin-bottom: 50px;">
+          <div class="logo-icon">
+            <span class="material-icons">shield</span>
+          </div>
+          <div class="logo-text">Policy<span>Hub</span></div>
+        </div>
+        <h1 style="font-size: 3.5rem;">Thank You</h1>
+        <p class="subtitle" style="max-width: 600px; margin: 0 auto 50px;">
+          Policy-as-Code: Making compliance programmable, auditable, and AI-ready
+        </p>
+        <div class="stats-grid" style="max-width: 900px; margin: 0 auto;">
+          <div class="stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Risk Domains</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">15+</div>
+            <div class="stat-label">Operators</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">8</div>
+            <div class="stat-label">MCP Tools</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">&lt;50ms</div>
+            <div class="stat-label">Eval Time</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-number">12 / 12</div>
+    </section>
+  </div>
+
+  <!-- Navigation Dots -->
+  <div class="nav-dots">
+    <div class="nav-dot active" data-slide="1"></div>
+    <div class="nav-dot" data-slide="2"></div>
+    <div class="nav-dot" data-slide="3"></div>
+    <div class="nav-dot" data-slide="4"></div>
+    <div class="nav-dot" data-slide="5"></div>
+    <div class="nav-dot" data-slide="6"></div>
+    <div class="nav-dot" data-slide="7"></div>
+    <div class="nav-dot" data-slide="8"></div>
+    <div class="nav-dot" data-slide="9"></div>
+    <div class="nav-dot" data-slide="10"></div>
+    <div class="nav-dot" data-slide="11"></div>
+    <div class="nav-dot" data-slide="12"></div>
+  </div>
+
+  <!-- Keyboard Hint -->
+  <div class="keyboard-hint">
+    Press <kbd>↑</kbd> <kbd>↓</kbd> or scroll to navigate
+  </div>
+
+  <script>
+    // Navigation dots functionality
+    const dots = document.querySelectorAll('.nav-dot');
+    const slides = document.getElementById('slides');
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        const slideNum = dot.getAttribute('data-slide');
+        document.getElementById(`slide-${slideNum}`).scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // Update active dot on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const slideNum = entry.target.id.replace('slide-', '');
+          dots.forEach(d => d.classList.remove('active'));
+          document.querySelector(`.nav-dot[data-slide="${slideNum}"]`)?.classList.add('active');
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.slide').forEach(slide => observer.observe(slide));
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      const currentSlide = document.querySelector('.nav-dot.active');
+      const currentNum = parseInt(currentSlide?.getAttribute('data-slide') || '1');
+
+      if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault();
+        if (currentNum < 12) {
+          document.getElementById(`slide-${currentNum + 1}`).scrollIntoView({ behavior: 'smooth' });
+        }
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
+        if (currentNum > 1) {
+          document.getElementById(`slide-${currentNum - 1}`).scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

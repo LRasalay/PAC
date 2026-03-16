@@ -1,0 +1,87 @@
+{
+  "id": "crm-counterparty-limits",
+  "version": "1.0.0",
+  "metadata": {
+    "name": "Counterparty Exposure Limits",
+    "description": "Ensures counterparty exposures remain within approved limits",
+    "domain": "CRM",
+    "effectiveDate": "2024-01-01",
+    "owner": "Counterparty Risk Management",
+    "severity": "critical",
+    "tags": ["counterparty", "limits", "exposure"]
+  },
+  "rules": [
+    {
+      "id": "cpl-001",
+      "name": "Counterparty limit approved",
+      "description": "Counterparty must have an approved credit limit",
+      "type": "required_field",
+      "severity": "critical",
+      "conditions": {
+        "all": [
+          { "path": "$.counterparty.limit.approved", "operator": "equals", "value": true },
+          { "path": "$.counterparty.limit.amount", "operator": "greater_than", "value": 0 }
+        ]
+      },
+      "remediation": "Obtain credit limit approval for the counterparty"
+    },
+    {
+      "id": "cpl-002",
+      "name": "Exposure within limit",
+      "description": "Current exposure must not exceed approved limit",
+      "type": "cross_field",
+      "severity": "critical",
+      "conditions": {
+        "path": "$.counterparty.exposure.utilizationPercent",
+        "operator": "less_than_or_equal",
+        "value": 100
+      },
+      "remediation": "Reduce exposure or request limit increase"
+    },
+    {
+      "id": "cpl-003",
+      "name": "Warning threshold monitoring",
+      "description": "Alert when exposure exceeds 80% of limit",
+      "type": "value_range",
+      "severity": "medium",
+      "conditions": {
+        "path": "$.counterparty.exposure.utilizationPercent",
+        "operator": "less_than_or_equal",
+        "value": 80
+      },
+      "remediation": "Monitor exposure closely as it approaches limit"
+    },
+    {
+      "id": "cpl-004",
+      "name": "Limit review current",
+      "description": "Credit limits must be reviewed at least annually",
+      "type": "temporal",
+      "severity": "high",
+      "conditions": {
+        "all": [
+          { "path": "$.counterparty.limit.lastReviewDate", "operator": "exists" },
+          { "path": "$.counterparty.limit.lastReviewDate", "operator": "date_within", "value": "365d" }
+        ]
+      },
+      "remediation": "Complete annual credit limit review"
+    },
+    {
+      "id": "cpl-005",
+      "name": "Collateral coverage adequate",
+      "description": "Collateral must cover exposure for secured counterparties",
+      "type": "conditional",
+      "severity": "high",
+      "when": {
+        "path": "$.counterparty.secured",
+        "operator": "equals",
+        "value": true
+      },
+      "conditions": {
+        "path": "$.counterparty.collateral.coverageRatio",
+        "operator": "greater_than_or_equal",
+        "value": 100
+      },
+      "remediation": "Increase collateral to cover exposure"
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capitalone.com/policy-as-code/policy-schema.json",
+  "title": "Policy Schema",
+  "description": "Schema for defining risk management and compliance policies",
+  "type": "object",
+  "required": ["id", "version", "metadata", "rules"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique policy identifier",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of the policy",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "rules": {
+      "type": "array",
+      "description": "List of rules to evaluate",
+      "items": {
+        "$ref": "#/$defs/rule"
+      },
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "required": ["name", "domain"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Human-readable policy name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed policy description"
+        },
+        "domain": {
+          "type": "string",
+          "enum": ["MRM", "ERM", "CRM"],
+          "description": "Risk domain: MRM (Model Risk), ERM (Enterprise Risk), CRM (Counterparty Risk)"
+        },
+        "effectiveDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Date when policy becomes effective"
+        },
+        "expirationDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Optional expiration date"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Team or person responsible for the policy"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Severity level of policy violations"
+        },
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Tags for categorization"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "url": {"type": "string", "format": "uri"}
+            }
+          },
+          "description": "External references and documentation"
+        }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "required": ["id", "name", "conditions"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique rule identifier within the policy",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable rule name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed rule description"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["required_field", "value_range", "cross_field", "temporal", "conditional", "custom"],
+          "description": "Rule type classification"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Severity of this specific rule (overrides policy default)"
+        },
+        "when": {
+          "$ref": "#/$defs/conditions",
+          "description": "Preconditions that must be met for rule to apply"
+        },
+        "conditions": {
+          "$ref": "#/$defs/conditions",
+          "description": "Conditions that must be satisfied for compliance"
+        },
+        "remediation": {
+          "type": "string",
+          "description": "Instructions for fixing violations"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional rule metadata"
+        }
+      }
+    },
+    "conditions": {
+      "oneOf": [
+        {"$ref": "#/$defs/singleCondition"},
+        {"$ref": "#/$defs/allCondition"},
+        {"$ref": "#/$defs/anyCondition"},
+        {"$ref": "#/$defs/notCondition"},
+        {
+          "type": "array",
+          "items": {"$ref": "#/$defs/conditions"}
+        }
+      ]
+    },
+    "singleCondition": {
+      "type": "object",
+      "required": ["path", "operator"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "JSONPath expression to extract value",
+          "pattern": "^\\$"
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "exists",
+            "equals",
+            "not_equals",
+            "greater_than",
+            "greater_than_or_equal",
+            "less_than",
+            "less_than_or_equal",
+            "in",
+            "not_in",
+            "matches",
+            "contains",
+            "starts_with",
+            "ends_with",
+            "date_before",
+            "date_after",
+            "date_within",
+            "between",
+            "length",
+            "length_greater_than",
+            "length_less_than",
+            "is_type"
+          ],
+          "description": "Comparison operator"
+        },
+        "value": {
+          "description": "Expected value for comparison"
+        }
+      }
+    },
+    "allCondition": {
+      "type": "object",
+      "required": ["all"],
+      "properties": {
+        "all": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/conditions"},
+          "description": "All conditions must be satisfied"
+        }
+      },
+      "additionalProperties": false
+    },
+    "anyCondition": {
+      "type": "object",
+      "required": ["any"],
+      "properties": {
+        "any": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/conditions"},
+          "description": "At least one condition must be satisfied"
+        }
+      },
+      "additionalProperties": false
+    },
+    "notCondition": {
+      "type": "object",
+      "required": ["not"],
+      "properties": {
+        "not": {
+          "$ref": "#/$defs/conditions",
+          "description": "Condition must NOT be satisfied"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

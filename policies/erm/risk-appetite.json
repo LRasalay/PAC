@@ -1,0 +1,80 @@
+{
+  "id": "erm-risk-appetite",
+  "version": "1.0.0",
+  "metadata": {
+    "name": "Risk Appetite Compliance",
+    "description": "Ensures business activities remain within defined risk appetite thresholds",
+    "domain": "ERM",
+    "effectiveDate": "2024-01-01",
+    "owner": "Enterprise Risk Management",
+    "severity": "critical",
+    "tags": ["risk-appetite", "limits", "thresholds"]
+  },
+  "rules": [
+    {
+      "id": "rap-001",
+      "name": "Operational loss within limits",
+      "description": "Operational losses must not exceed quarterly limits",
+      "type": "value_range",
+      "severity": "critical",
+      "conditions": {
+        "path": "$.metrics.operationalLoss.quarterlyTotal",
+        "operator": "less_than_or_equal",
+        "value": 10000000
+      },
+      "remediation": "Review operational loss drivers and implement controls"
+    },
+    {
+      "id": "rap-002",
+      "name": "Credit risk exposure within limits",
+      "description": "Credit risk exposure must remain within defined limits",
+      "type": "value_range",
+      "severity": "critical",
+      "conditions": {
+        "path": "$.metrics.creditRisk.utilizationPercent",
+        "operator": "less_than_or_equal",
+        "value": 85
+      },
+      "remediation": "Reduce credit risk exposure to within 85% of limit"
+    },
+    {
+      "id": "rap-003",
+      "name": "Market risk VaR within limits",
+      "description": "Value at Risk must remain within defined thresholds",
+      "type": "value_range",
+      "severity": "high",
+      "conditions": {
+        "path": "$.metrics.marketRisk.varUtilization",
+        "operator": "less_than_or_equal",
+        "value": 90
+      },
+      "remediation": "Reduce market risk positions to bring VaR within limits"
+    },
+    {
+      "id": "rap-004",
+      "name": "Liquidity coverage ratio adequate",
+      "description": "Liquidity coverage ratio must meet regulatory minimums",
+      "type": "value_range",
+      "severity": "critical",
+      "conditions": {
+        "path": "$.metrics.liquidity.coverageRatio",
+        "operator": "greater_than_or_equal",
+        "value": 100
+      },
+      "remediation": "Increase high-quality liquid assets to meet LCR requirements"
+    },
+    {
+      "id": "rap-005",
+      "name": "Concentration risk within limits",
+      "description": "Single name concentration must not exceed thresholds",
+      "type": "value_range",
+      "severity": "high",
+      "conditions": {
+        "path": "$.metrics.concentration.largestExposurePercent",
+        "operator": "less_than_or_equal",
+        "value": 10
+      },
+      "remediation": "Reduce concentration by diversifying exposures"
+    }
+  ]
+}

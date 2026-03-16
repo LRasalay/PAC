@@ -1,0 +1,17 @@
+[project]
+name = "policy-as-code-mcp"
+version = "1.0.0"
+description = "MCP Server for Policy-as-Code System - Risk Management & Compliance"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.25.0",
+]
+
+[project.scripts]
+policy-as-code-mcp = "server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

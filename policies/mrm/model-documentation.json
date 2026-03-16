@@ -1,0 +1,70 @@
+{
+  "id": "mrm-model-documentation",
+  "version": "1.0.0",
+  "metadata": {
+    "name": "Model Documentation Requirements",
+    "description": "Ensures all models have proper documentation including technical specs, validation reports, and ownership information",
+    "domain": "MRM",
+    "effectiveDate": "2024-01-01",
+    "owner": "Model Risk Management Team",
+    "severity": "high",
+    "tags": ["documentation", "compliance", "model-governance"]
+  },
+  "rules": [
+    {
+      "id": "doc-001",
+      "name": "Model documentation exists",
+      "description": "Every model must have associated documentation with a valid URL",
+      "type": "required_field",
+      "severity": "critical",
+      "conditions": {
+        "all": [
+          { "path": "$.model.documentation.url", "operator": "exists" },
+          { "path": "$.model.documentation.url", "operator": "matches", "value": "^https?://.+" }
+        ]
+      },
+      "remediation": "Upload model documentation to the approved document repository and provide the URL"
+    },
+    {
+      "id": "doc-002",
+      "name": "Documentation reviewed within 365 days",
+      "description": "Model documentation must be reviewed at least annually",
+      "type": "temporal",
+      "severity": "high",
+      "conditions": {
+        "all": [
+          { "path": "$.model.documentation.lastReviewDate", "operator": "exists" },
+          { "path": "$.model.documentation.lastReviewDate", "operator": "date_within", "value": "365d" }
+        ]
+      },
+      "remediation": "Schedule and complete annual documentation review"
+    },
+    {
+      "id": "doc-003",
+      "name": "Model owner assigned",
+      "description": "Every model must have a designated owner",
+      "type": "required_field",
+      "severity": "high",
+      "conditions": {
+        "path": "$.model.owner",
+        "operator": "exists"
+      },
+      "remediation": "Assign a model owner in the model inventory"
+    },
+    {
+      "id": "doc-004",
+      "name": "Technical specification complete",
+      "description": "Models must have complete technical specifications",
+      "type": "required_field",
+      "severity": "medium",
+      "conditions": {
+        "all": [
+          { "path": "$.model.specification.methodology", "operator": "exists" },
+          { "path": "$.model.specification.inputVariables", "operator": "exists" },
+          { "path": "$.model.specification.outputVariables", "operator": "exists" }
+        ]
+      },
+      "remediation": "Complete the technical specification including methodology, inputs, and outputs"
+    }
+  ]
+}
